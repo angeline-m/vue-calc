@@ -33,32 +33,32 @@
 				<div class="col-12">{{display}}</div>
 			</div>
 			<div class="row gap-3 m-3">
-				<button class="col bg-warning text-white text-center py-3 rounded fs-3 text-uppercase clear clear-entry">Clear entry</button>
-				<button class="col bg-warning text-white text-center py-3 rounded fs-3 text-uppercase clear clear-all">Clear all</button>
+				<button class="col bg-warning text-white text-center py-3 rounded fs-3 text-uppercase clear clear-entry" @click="regInput($event)">Clear entry</button>
+				<button class="col bg-warning text-white text-center py-3 rounded fs-3 text-uppercase clear clear-all" @click="regInput($event)">Clear all</button>
 			</div>
 			<div class="row gap-3 m-3">
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">1</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">2</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">3</button>
-				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="updateOperator($event)">+</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">1</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">2</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">3</button>
+				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="regInput($event)">+</button>
 			</div>
 			<div class="row gap-3 m-3">
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">4</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">5</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">6</button>
-				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="updateOperator($event)">-</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">4</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">5</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">6</button>
+				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="regInput($event)">-</button>
 			</div>
 			<div class="row gap-3 m-3">
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">7</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">8</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">9</button>
-				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="updateOperator($event)">*</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">7</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">8</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">9</button>
+				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="regInput($event)">*</button>
 			</div>
 			<div class="row gap-3 m-3">
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="updateNum($event)">0</button>
-				<button class="col bg-secondary text-white text-center py-3 rounded fs-3"@click="updateNum($event)">.</button>
-				<button class="col bg-danger text-white text-center py-3 rounded fs-3 operator equals">=</button>
-				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="updateOperator($event)">/</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3" @click="regInput($event)">0</button>
+				<button class="col bg-secondary text-white text-center py-3 rounded fs-3"@click="regInput($event)">.</button>
+				<button class="col bg-danger text-white text-center py-3 rounded fs-3 operator equals" @click="regInput($event)">=</button>
+				<button class="col bg-primary text-white text-center py-3 rounded fs-3 operator" @click="regInput($event)">/</button>
 			</div>
 		</div>
 		<script
@@ -76,79 +76,63 @@
 					firstNum: '',
 					secondNum: '',
 					operator: '',
-					sum: '',
+					result: '',
 				},
 				methods: {
-					updateNum: function(event) {
-						let val = event.target.innerHTML;
-						if(this.pressedBtn == '+' || this.pressedBtn == '-' || this.pressedBtn == '*' || this.pressedBtn == '/') {
-							if(val == '.' && this.secondNum.indexOf('.') > -1)  {
-								console.log('sorry you cannot do that');
+					// idea: don't update the firstNum or secondNum until an operator button is pressed
+					// will only update display but not actual number stored
+					regInput: function(event) {
+						let input = parseInt(event.target.innerHTML) ? parseInt(event.target.innerHTML) : event.target.innerHTML;
+
+						if(input == '0') {
+							input = 0;
+						}
+						
+						if(typeof input == 'number' || input == '.') {
+							this.updateNum(input);
+						}
+						else {
+							if(input.includes('Clear')) {
+								this.clear(input);
+							}
+							// one case for clear buttons
+							// one case for operator buttons
+							// one case for equals button
+						}
+					},
+					updateNum: function(input) {
+						// this is the first number
+						if(this.secondNum == '') {
+							if(this.firstNum == '') {
+								// first num is empty
+								if(input == '.') {
+									this.firstNum = '0.';
+								}
+								else {
+									this.firstNum = input;
+								}
 							}
 							else {
-								this.secondNum = '' + this.secondNum + val;
-								this.display = this.secondNum;
+								if(input == '.' && this.firstNum.indexOf('.') > -1) {
+									console.log("you can't do that");
+								}
+								else {
+									this.firstNum = this.firstNum + '' + input;
+								}
 							}
-						}
-						else 
-						{
-							if(val == '.' && this.firstNum.indexOf('.') > -1)  {
-								console.log('sorry you cannot do that');
-							} else {
-								this.firstNum = '' + this.firstNum + val;
-								this.display = this.firstNum;
-							}
-						}
-						this.pressedBtn = val;
-					},
-					updateOperator: function(event) {
-						let op = event.target.innerHTML;
-						if(this.pressedBtn == '+' || this.pressedBtn == '-' || this.pressedBtn == '*' || this.pressedBtn == '/') {
-							if(this.secondNum != '') {
-								this.calculate(this.firstNum, this.secondNum, this.pressedBtn);
-							}
-							this.pressedBtn = op;
-						}
-						else {
-							if(this.firstNum == '') {
-								this.firstNum = '0';
-								this.pressedBtn = op;
-							}
-
-							if(this.secondNum == '') {
-								this.pressedBtn = op;
-							}
+							this.display = this.firstNum;
 						}
 					},
-					calculate: function(firstNum, secondNum, operator) {
-						// check if either number is a float, in which case calculate both as floats
-						if(firstNum % 1 != 0 || secondNum % 1 != 0) {
-							switch(operator) {
-								case '+':
-									break;
-								case '-':
-									break;
-								case '*':
-									break;
-								case '/':
-									break;
-								default:
-									break;
-							}
+					clear: function(input) {
+						if(input.includes('entry')) {
+							this.display = '0';
 						}
-						else {
-							switch(operator) {
-								case '+':
-									break;
-								case '-':
-									break;
-								case '*':
-									break;
-								case '/':
-									break;
-								default:
-									break;
-							}
+						if(input.includes('all')) {
+							this.firstNum = '';
+							this.secondNum = '';
+							this.operator = '';
+							this.result = '';
+							this.display = '0';
 						}
 					}
 				},
